@@ -4,10 +4,10 @@
   "description": "",
   "main": "src/index.js",
   "type": "module",
+  "author": "Bbg0kif",
+  "license": "MIT",
   "scripts": {
     "start": "node examples/demo.js"
   },
-  "keywords": [],
-  "author": "Bbg0kif",
-  "license": "MIT"
+  "keywords": []
 }
