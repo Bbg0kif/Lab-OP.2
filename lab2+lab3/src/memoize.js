@@ -15,9 +15,7 @@ export function memoize(fn, options = {}) {
 
     if (expireTime && timestamps.has(key)) {
       if (Date.now() - timestamps.get(key) > expireTime) {
-        cache.delete(key);
-        usageCount.delete(key);
-        timestamps.delete(key);
+        removeKey(key);
       }
     }
 
@@ -34,14 +32,7 @@ export function memoize(fn, options = {}) {
     const result = fn(...args);
 
     if (cache.size >= maxSize) {
-      if (strategy === 'LFU') {
-        let minKey = [...usageCount.entries()].reduce((a, b) => a[1] < b[1] ? a : b)[0];
-        cache.delete(minKey);
-        usageCount.delete(minKey);
-        timestamps.delete(minKey);
-      } else {
-        cache.delete(cache.keys().next().value);
-      }
+      applyEviction();
     }
 
     cache.set(key, result);
@@ -49,4 +40,21 @@ export function memoize(fn, options = {}) {
     timestamps.set(key, Date.now());
     return result;
   };
+
+  function removeKey(key) {
+    cache.delete(key);
+    usageCount.delete(key);
+    timestamps.delete(key);
+  }
+
+  function applyEviction() {
+    if (customPolicy) {
+      customPolicy(cache, usageCount, timestamps);
+    } else if (strategy === 'LFU') {
+      let minKey = [...usageCount.entries()].reduce((a, b) => a[1] < b[1] ? a : b)[0];
+      removeKey(minKey);
+    } else {
+      removeKey(cache.keys().next().value);
+    }
+  }
 }
