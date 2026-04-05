@@ -33,4 +33,11 @@ export class PriorityQueue {
     const idx = this._findIndex(type);
     return idx !== -1 ? this.items[idx].item : null;
   }
+  dequeue(type) {
+    const idx = this._findIndex(type);
+    if (idx === -1) return null;
+    
+    const removedItem = this.items.splice(idx, 1)[0];
+    return removedItem.item;
+  }
 }
